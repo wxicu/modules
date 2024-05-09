@@ -13,7 +13,7 @@ nextflow_process {
     tag "freebayes"
     tag "scsplit/count"
 
-    config "nextflow.config"
+    config "./nextflow.config"
 
 
     test("demultiplexing - bam") {
@@ -25,6 +25,7 @@ nextflow_process {
                     """
                     input[0] =[
                             [ id:'test'],
+			    //file("/home/icb/xichen.wu/modules/modules/nf-core/scsplit/run/tests/chr21.bam")
                             file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
                         ]
 
@@ -38,6 +39,7 @@ nextflow_process {
                     """
                     bam_channel = Channel.of([
                                     [ id:'test'],
+				    //file("/home/icb/xichen.wu/modules/modules/nf-core/scsplit/run/tests/chr21.bam")
                                     file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
                                     ])
                     bai_channel = SAMTOOLS_INDEX.out.bai
@@ -51,11 +53,13 @@ nextflow_process {
                     input[0] = bam_channel.join(bai_channel).join(other_input_channel)
                     input[1] = [
                                 [ id:'ref_test'],
-                                file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta', checkIfExists: true)                        
+				file('/home/icb/xichen.wu/gene_demulti/data/refdata-cellranger-hg19-3.0.0/fasta/genome.fa')
+                                //file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta', checkIfExists: true)                        
                                ]
                     input[2] = [
                                 [ id:'ref_test'],
-                                file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta.fai', checkIfExists: true)                        
+				file(/home/icb/xichen.wu/gene_demulti/data/refdata-cellranger-hg19-3.0.0/fasta/genome.fa.fai)
+                                //file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta.fai', checkIfExists: true)                        
                                ]
                     input[3] = [[ id:'other_test'],[]]
                     input[4] = [[ id:'other_test'],[]]
@@ -71,6 +75,7 @@ nextflow_process {
                     """
                     bam_channel = Channel.of([
                                     [ id:'test'],
+				    //file("/home/icb/xichen.wu/modules/modules/nf-core/scsplit/run/tests/chr21.bam")
                                     file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
                                     ])
                     bai_channel = SAMTOOLS_INDEX.out.bai
