@@ -51,6 +51,13 @@ nextflow_process {
                                 [ id:'ref_test'],
                                 file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta', checkIfExists: true)                        
                                ]
+                    input[2] = [
+                                [ id:'ref_test'],
+                                file(params.modules_testdata_base_path + '/genomics/homo_sapiens/genome/chr21/sequence/genome.fasta.fai', checkIfExists: true)                        
+                               ]
+                    input[3] = [[ id:'other_test'],[]]
+                    input[4] = [[ id:'other_test'],[]]
+                    input[5] = [[ id:'other_test'],[]]
 
                     """
                 }
