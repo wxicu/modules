@@ -10,11 +10,7 @@ nextflow_process {
     tag "scsplit"
     tag "scsplit/run"
     tag "samtools/index"
-    tag "freebayes"
     tag "scsplit/count"
-
-    config "./nextflow.config"
-
 
     test("demultiplexing - bam") {
 
@@ -32,39 +28,6 @@ nextflow_process {
                 }
             }
 
-            run("FREEBAYES") {
-                script "../../../freebayes/main.nf"
-                process {
-                    """
-                    bam_channel = Channel.of([
-                                    [ id:'test'],
-                                    file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
-                                    ])
-                    bai_channel = SAMTOOLS_INDEX.out.bai
-                    other_input_channel = Channel.of([
-                                            [ id:'test'],
-                                            [],
-                                            [],
-                                            [],
-                                            ])
-
-                    input[0] = bam_channel.join(bai_channel).join(other_input_channel)
-                    input[1] = [
-                                [ id:'ref_test'],
-                                file('/home/icb/xichen.wu/gene_demulti/data/refdata-cellranger-hg19-3.0.0/fasta/genome.fa')
-                               ]
-                    input[2] = [
-                                [ id:'ref_test'],
-				                file('/home/icb/xichen.wu/gene_demulti/data/refdata-cellranger-hg19-3.0.0/fasta/genome.fa.fai')
-                               ]
-                    input[3] = [[ id:'other_test'],[]]
-                    input[4] = [[ id:'other_test'],[]]
-                    input[5] = [[ id:'other_test'],[]]
-
-                    """
-                }
-            }
-
             run("SCSPLIT_COUNT") {
                 script "../../count/main.nf"
                 process {
@@ -74,12 +37,12 @@ nextflow_process {
                                     file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
                                     ])
                     bai_channel = SAMTOOLS_INDEX.out.bai
-                    vcf_channel = FREEBAYES.out.vcf
-                    barcode_channel = Channel.of([[ id:'test'],                                           
+                    vcf_barcode_channel = Channel.of([[ id:'test'],
+                                                    file(/home/icb/xichen.wu/modules/modules/test.vcf),                                           
                                                     file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true)
                                                   ])
 
-                    input[0] = bam_channel.join(bai_channel).join(vcf_channel).join(barcode_channel)
+                    input[0] = bam_channel.join(bai_channel).join(vcf_barcode_channel)
 
                     """
                 }
