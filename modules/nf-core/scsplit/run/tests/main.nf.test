@@ -38,7 +38,7 @@ nextflow_process {
                                     ])
                     bai_channel = SAMTOOLS_INDEX.out.bai
                     vcf_barcode_channel = Channel.of([[ id:'test'],
-                                                    file(/home/icb/xichen.wu/modules/modules/test.vcf),                                           
+                                                    file("/home/icb/xichen.wu/modules/modules/test.vcf"),                                           
                                                     file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true)
                                                   ])
 
