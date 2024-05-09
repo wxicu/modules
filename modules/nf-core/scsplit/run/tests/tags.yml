@@ -1,0 +1,2 @@
+scsplit/run:
+  - "modules/nf-core/scsplit/run/**"

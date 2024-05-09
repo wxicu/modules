@@ -1,0 +1,83 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "scsplit_run"
+description: Demultiplexing and generate ALT P/A matrix with scSplit.
+keywords:
+  - single-cell
+  - demultiplex
+  - genomics
+  - scSplit
+tools:
+  - "scsplit":
+      description: "Genotype-free demultiplexing of pooled single-cell RNA-Seq"
+      homepage: "https://github.com/jon-xu/scSplit"
+      documentation: "https://github.com/jon-xu/scSplit"
+      tool_dev_url: "https://github.com/jon-xu/scSplit"
+      doi: "10.1186/s13059-019-1852-7"
+      licence: ["MIT"]
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. `[ id:'sample1', single_end:false ]`
+
+  - ref:
+      type: file
+      description: Input Ref count matrix
+      pattern: "*_ref_filtered.csv"
+
+  - alt:
+      type: file
+      description: Input Alt count matrix
+      pattern: "*_alt_filtered.csv"
+
+  - num:
+      type: integer
+      description: Expected number of mixed samples. Enable autodetect mode when setting to zero.
+
+  - vcf:
+      type: file
+      description: Optional known individual genotypes to limit distinguishing variants to available variants.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. `[ id:'sample1', single_end:false ]`
+
+  - versions:
+      type: file
+      description: File containing software versions
+      pattern: "versions.yml"
+  - result:
+      type: file
+      description: Barcodes assigned to each of the N+1 cluster (N singlets and 1 doublet cluster), doublet marked as DBL-<n> (n stands for the cluster number), e.g SNG-0 means the cluster 0 is a singlet cluster.
+      pattern: "*_result.csv"
+  - dist_variants:
+      type: file
+      description: The distinguishing variants that can be used to genotype and assign sample to clusters.
+      pattern: "*_dist_variants.txt"
+  - dist_matrix:
+      type: file
+      description: The ALT allele Presence/Absence (P/A) matrix on distinguishing variants for all samples as a reference in assigning sample to clusters, NOT including the doublet cluster, whose sequence number would be different every run.
+      pattern: "*_dist_matrix.csv"
+  - alt_allele:
+      type: file
+      description: The full ALT allele Presence/Absence (P/A) matrix for all samples, NOT including the doublet cluster, whose sequence number would be different every run.
+      pattern: "*_PA_matrix.csv"
+  - probability:
+      type: file
+      description: The probability of each cell belonging to each sample
+      pattern: "*_P_s_c.csv"
+  - log:
+      type: file
+      description: The log file containing information for current run, iterations, and final Maximum Likelihood and doublet sample.
+      pattern: "*_scSplit.log"
+
+authors:
+  - "@wxicu"
+maintainers:
+  - "@wxicu"

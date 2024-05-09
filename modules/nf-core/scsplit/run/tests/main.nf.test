@@ -1,0 +1,138 @@
+// nf-core modules test scsplit/run
+nextflow_process {
+
+    name "Test Process SCSPLIT_RUN"
+    script "../main.nf"
+    process "SCSPLIT_RUN"
+
+    tag "modules"
+    tag "modules_nfcore"
+    tag "scsplit"
+    tag "scsplit/run"
+    tag "samtools/index"
+    tag "scsplit/count"
+
+
+    test("demultiplexing - bam") {
+
+        setup {
+            run("SAMTOOLS_INDEX") {
+                script "../../../samtools/index/main.nf"
+                process {
+                    """
+                    input[0] =[
+                            [ id:'test'],
+                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
+                        ]
+
+                    """
+                }
+            }
+
+            run("SCSPLIT_COUNT") {
+                script "../../count/main.nf"
+                process {
+                    """
+                    bam_channel = Channel.of([
+                                    [ id:'test'],
+                                    file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
+                                    ])
+                    bai_channel = SAMTOOLS_INDEX.out.bai
+                    vcf_barcode_channel = Channel.of([
+                                            [ id:'test'],
+                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/donor_genotype_chr21.vcf', checkIfExists: true),
+                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true),
+                                            ])
+
+                    input[0] = bam_channel.join(bai_channel).join(vcf_barcode_channel)
+
+                    """
+                }
+            }
+
+        }
+  
+        when {
+            process {
+                """ 
+                ref_channel = SCSPLIT_COUNT.out.ref_filtered
+                alt_channel = SCSPLIT_COUNT.out.alt_filtered            
+                num_channel = Channel.of([[id:'test'], 2])
+                vcf_channel = Channel.of([[id:'test'], []])
+                input[0] = ref_channel.join(alt_channel).join(num_channel).join(vcf_channel)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+    test("demultiplexing - bam - stub") {
+
+        options "-stub"
+
+        setup {
+            run("SAMTOOLS_INDEX") {
+                script "../../../samtools/index/main.nf"
+                process {
+                    """
+                    input[0] =[
+                            [ id:'test'],
+                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
+                        ]
+
+                    """
+                }
+            }
+
+            run("SCSPLIT_COUNT") {
+                script "../../count/main.nf"
+                process {
+                    """
+                    bam_channel = Channel.of([
+                                    [ id:'test'],
+                                    file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
+                                    ])
+                    bai_channel = SAMTOOLS_INDEX.out.bai
+                    vcf_barcode_channel = Channel.of([
+                                            [ id:'test'],
+                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/donor_genotype_chr21.vcf', checkIfExists: true),
+                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true),
+                                            ])
+
+                    input[0] = bam_channel.join(bai_channel).join(vcf_barcode_channel)
+
+                    """
+                }
+            }
+
+        }
+
+        when {
+            process {
+                """                
+                ref_channel = SCSPLIT_COUNT.out.ref_filtered
+                alt_channel = SCSPLIT_COUNT.out.alt_filtered            
+                num_channel = Channel.of([[id:'test'], 2])
+                vcf_channel = Channel.of([[id:'test'], []])
+                input[0] = ref_channel.join(alt_channel).join(num_channel).join(vcf_channel)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+
+    }
+
+}
