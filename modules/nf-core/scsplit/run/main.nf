@@ -27,6 +27,8 @@ process SCSPLIT_RUN {
     def VERSION = '1.0.8' // WARN: Version information not provided by tool on CLI. Please update version string below when bumping container versions.
 
     """
+    scsplit_path=${workflow.containerEngine:+"":\$(python -c 'import site; print("".join(site.getsitepackages()))')/scSplit/}
+    \${scsplit_path}scSplit count -v
     scSplit run \\
         -r $ref \\
         -a $alt \\
