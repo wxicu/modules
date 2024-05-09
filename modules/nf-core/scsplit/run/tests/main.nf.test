@@ -13,6 +13,8 @@ nextflow_process {
     tag "freebayes"
     tag "scsplit/count"
 
+    config "nextflow.config"
+
 
     test("demultiplexing - bam") {
 
