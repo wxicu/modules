@@ -65,7 +65,13 @@ nextflow_process {
         then {
             assertAll(
                 { assert process.success },
-                { assert snapshot(process.out).match() }
+                { assert snapshot(process.out.versions).match() },
+                { assert path(process.out.result.get(0).get(1)).exists()},
+                { assert path(process.out.log.get(0).get(1)).exists()},
+                { assert path(process.out.probability.get(0).get(1)).exists()},
+                { assert path(process.out.dist_variants.get(0).get(1)).exists()},
+                { assert path(process.out.dist_matrix.get(0).get(1)).exists()},
+                { assert path(process.out.alt_allele.get(0).get(1)).exists()}
             )
         }
 
