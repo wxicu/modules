@@ -3,7 +3,7 @@ process SCSPLIT_RUN {
     label 'process_medium'
 
     conda "${moduleDir}/environment.yml"
-    container 'irenerobles93/scsplit:1.0.8'
+    container 'wxicu/scsplit:1.0.8'
 
     input:
     tuple val(meta), path(ref), path(alt), val(num), path(vcf)
@@ -27,9 +27,12 @@ process SCSPLIT_RUN {
     def VERSION = '1.0.8' // WARN: Version information not provided by tool on CLI. Please update version string below when bumping container versions.
 
     """
-    scsplit_path=${workflow.containerEngine} ? '' : "\$(python -c 'import site; print("".join(site.getsitepackages()))')/scSplit/"
-    \${scsplit_path}scSplit count -v
-    scSplit run \\
+    if [ -z "${workflow.containerEngine}" ];
+        then scsplit_path="scSplit";
+    else
+        scsplit_path="python \$(python -c 'import site; print("".join(site.getsitepackages()))')/scSplit/scSplit";
+    fi
+    \$scsplit_path run \\
         -r $ref \\
         -a $alt \\
         -n $num \\

@@ -38,9 +38,9 @@ nextflow_process {
                                     ])
                     bai_channel = SAMTOOLS_INDEX.out.bai
                     vcf_barcode_channel = Channel.of([[ id:'test'],
-                                                    file("/home/icb/xichen.wu/modules/modules/test.vcf"),                                           
-                                                    file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true)
-                                                  ])
+                                                      file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/donor_genotype_chr21.vcf', checkIfExists: true),                               
+                                                      file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true)
+                                                     ])
 
                     input[0] = bam_channel.join(bai_channel).join(vcf_barcode_channel)
 
@@ -75,51 +75,17 @@ nextflow_process {
 
         options "-stub"
 
-        setup {
-            run("SAMTOOLS_INDEX") {
-                script "../../../samtools/index/main.nf"
-                process {
-                    """
-                    input[0] =[
-                            [ id:'test'],
-                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
-                        ]
-
-                    """
-                }
-            }
-
-            run("SCSPLIT_COUNT") {
-                script "../../count/main.nf"
-                process {
-                    """
-                    bam_channel = Channel.of([
-                                    [ id:'test'],
-                                    file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/chr21.bam', checkIfExists: true)
-                                    ])
-                    bai_channel = SAMTOOLS_INDEX.out.bai
-                    vcf_barcode_channel = Channel.of([
-                                            [ id:'test'],
-                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/donor_genotype_chr21.vcf', checkIfExists: true),
-                                            file(params.modules_testdata_base_path + '/genomics/homo_sapiens/demultiplexing/barcodes.tsv', checkIfExists: true),
-                                            ])
-
-                    input[0] = bam_channel.join(bai_channel).join(vcf_barcode_channel)
-
-                    """
-                }
-            }
-
-        }
-
         when {
             process {
+                
                 """                
-                ref_channel = SCSPLIT_COUNT.out.ref_filtered
-                alt_channel = SCSPLIT_COUNT.out.alt_filtered            
-                num_channel = Channel.of([[id:'test'], 2])
-                vcf_channel = Channel.of([[id:'test'], []])
-                input[0] = ref_channel.join(alt_channel).join(num_channel).join(vcf_channel)
+                input[0] =[
+                            [ id:'test'],
+                            file(params.modules_testdata_base_path + '/imaging/csv_aggregation/phenotyped/Phenotyped_sample1.csv', checkIfExists: true),
+                            file(params.modules_testdata_base_path + '/imaging/csv_aggregation/phenotyped/Phenotyped_sample2.csv', checkIfExists: true),
+                            2,
+                            []
+                        ]
                 """
             }
         }
